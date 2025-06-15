@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CinemaLux - Кинотеатр с удобным приложением для Windows</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow-x: hidden;
+      font-family: 'Roboto', sans-serif;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+
+    body {
+      position: relative;
+      color: #fff;
+    }
+
+    /* Экран загрузки */
+    .loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease-out;
+    }
+
+    .loading-logo {
+      font-size: 3em;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: #FFC107;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    }
+p {
+  text-shadow: 
+    0 1px 1px rgba(0, 0, 0, 0.5),
+    0 1px 3px rgba(0, 0, 0, 0.7),
+    0 2px 5px rgba(0, 0, 0, 0.3);
+}
+h3 {
+  text-shadow: 
+    0 0 2px rgba(0, 0, 0, 0.8),
+    0 0 5px rgba(0, 0, 0, 0.6),
+    0 0 10px rgba(0, 0, 0, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.5);
+}
+li {
+  text-shadow: 
+    0 1px 2px rgb(0, 0, 0),
+    0 1px 3px rgba(0, 0, 0, 0.3);
+}
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      border-top-color: #FFC107;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      margin-top: 20px;
+      font-size: 1.2em;
+      color: rgba(255, 255, 255, 0.8);
+      text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    }
+
+    .background-3d {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      opacity: 0.9;
+    }
+
+    /* Скрываем лого Spline */
+    .spline-watermark {
+      display: none !important;
+    }
+
+    .header {
+      padding: 20px 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+    }
+
+    .logo {
+      font-size: 2em;
+      font-weight: bold;
+      color: #fff;
+      text-decoration: none;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    }
+
+    .logo span {
+      color: #FFC107;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 30px;
+    }
+
+    .nav-link {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    }
+
+    .nav-link:hover {
+      color: #FFC107;
+    }
+
+    .glass-section {
+      backdrop-filter: blur(12px);
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 40px;
+      margin: 60px auto;
+      max-width: 1100px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    .container {
+      width: 90%;
+      margin: 0 auto;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      text-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    }
+
+    h2 {
+      text-align: center;
+      font-size: 2.5em;
+      margin-bottom: 20px;
+      color: #fff;
+      position: relative;
+      padding-bottom: 15px;
+    }
+
+    h2:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 3px;
+      background: #FFC107;
+    }
+
+    .highlight {
+      color: #FFC107;
+      font-weight: bold;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    }
+
+    .features, .cinema-halls, .contact-info, .screenshots {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      justify-content: center;
+    }
+
+    .feature-card, .hall-card, .contact-item, .screenshot {
+      flex: 1 1 250px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .feature-card:hover, .hall-card:hover, .contact-item:hover, .screenshot:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    }
+
+    .feature-icon, .contact-icon {
+      font-size: 2em;
+      margin-bottom: 12px;
+      color: #FFC107;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    }
+
+    .hall-image {
+      width: 100%;
+      height: 180px;
+      border-radius: 12px;
+      object-fit: cover;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .screenshot img {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .hall-overlay {
+      margin-top: 12px;
+    }
+
+    /* Слайдер залов */
+    .halls-slider {
+      position: relative;
+      max-width: 800px;
+      margin: 0 auto;
+      overflow: hidden;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .slider-track {
+      display: flex;
+      transition: transform 0.5s ease;
+    }
+
+    .slider-slide {
+      min-width: 100%;
+    }
+
+    .slider-slide img {
+      width: 100%;
+      height: 400px;
+      object-fit: cover;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: white;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(10px);
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 10px;
+    }
+
+    .footer-link {
+      color: #FFC107;
+      text-decoration: none;
+      transition: opacity 0.3s;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    }
+
+    .footer-link:hover {
+      opacity: 0.8;
+    }
+
+    .download-btn {
+      display: inline-block;
+      background-color: #FFC107;
+      color: #000;
+      padding: 15px 30px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 1.1em;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      transition: transform 0.3s, box-shadow 0.3s;
+      margin: 10px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+
+    .download-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+    }
+
+    .download-buttons {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .app-preview {
+      max-width: 300px;
+      margin: 0 auto;
+      display: block;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      border: 2px solid rgba(255,255,255,0.2);
+    }
+
+    .cta-section {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .cta-title {
+      font-size: 3em;
+      margin-bottom: 20px;
+      text-shadow: 0 3px 8px rgba(0,0,0,0.6);
+    }
+
+    .cta-subtitle {
+      font-size: 1.5em;
+      margin-bottom: 40px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    }
+
+    .windows-features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+    }
+
+    .windows-feature {
+      background: rgba(0,95,163,0.2);
+      border-radius: 12px;
+      padding: 25px;
+      border: 1px solid rgba(0,95,163,0.5);
+    }
+
+    .windows-icon {
+      font-size: 2em;
+      color: #00adef;
+      margin-bottom: 15px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    }
+
+    @media (max-width: 768px) {
+      .header-content {
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .nav-links {
+        gap: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      h2 {
+        font-size: 2em;
+      }
+      
+      .glass-section {
+        padding: 25px;
+        margin: 30px auto;
+      }
+      
+      .slider-slide img {
+        height: 250px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Экран загрузки -->
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-logo">CINEMA<span>LUX</span></div>
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Загрузка 3D сцены...</div>
+  </div>
+
+  <!-- 3D Background Scene (Spline) -->
+  <div class="background-3d">
+    <iframe src="https://my.spline.design/liquidspiral-p3N3eNcVbGbeAv0KOJU0taPq/" frameborder="0" width="100%" height="100%"></iframe>
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <a href="#" class="logo">CINEMA<span>LUX</span></a>
+      <nav class="nav-links">
+        <a href="#app" class="nav-link">Приложение</a>
+        <a href="#halls" class="nav-link">Наши залы</a>
+        <a href="#download" class="nav-link">Скачать</a>
+        <a href="#contacts" class="nav-link">Контакты</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero CTA Section -->
+  <section class="cta-section">
+    <h1 class="cta-title">Кинотеатр нового поколения</h1>
+    <p class="cta-subtitle">Скачайте приложение <span class="highlight">CinemaLux</span> и получите доступ к самым горячим премьерам, удобной покупке билетов и эксклюзивным предложениям</p>
+    <a href="#download" class="download-btn">Скачать приложение</a>
+  </section>
+
+  <!-- App Screenshots Section -->
+  <section id="app" class="glass-section">
+    <div class="container">
+      <h2>Приложение CinemaLux</h2>
+      <p style="text-align: center; max-width: 800px; margin: 0 auto 40px;">
+        CinemaLux - это не просто кинотеатр, это целая экосистема для настоящих киноманов. Наше приложение сочетает в себе простоту использования и мощный функционал. 
+      </p>
+      
+      <div class="screenshots">
+        <div class="screenshot">
+          <img src="assets/Снимок экрана 2025-05-22 042605.png" alt="Главный экран приложения">
+          <h3>Страница входа</h3>
+          <p>Быстрый вход через социальные сети или электронную почту. Ваши данные надежно защищены.</p>
+        </div>
+        <div class="screenshot">
+          <img src="assets/Снимок экрана 2025-05-22 042715.png" alt="Выбор места">
+          <h3>Главный экран</h3>
+          <p>Все премьеры, акции и специальные предложения собраны в одном месте. Удобная навигация и фильтрация по жанрам.</p>
+        </div>
+        <div class="screenshot">
+          <img src="assets/Снимок экрана 2025-05-22 042841.png" alt="Мои билеты">
+          <h3>Мои билеты</h3>
+          <p>Все купленные билеты всегда под рукой. QR-коды для быстрого входа в зал. История просмотренных фильмов.</p>
+        </div>
+      </div>
+
+      <div style="margin-top: 40px; text-align: center;">
+        <h3>Дополнительные возможности</h3>
+        <p>Наше приложение постоянно развивается. В ближайших обновлениях появятся:</p>
+        <ul style="text-align: left; max-width: 600px; margin: 20px auto;">
+          <li>Возможность бронирования мест для групп</li>
+          
+          <li>Виртуальный тур по кинотеатру перед посещением</li>
+         
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cinema Halls Section -->
+  <section id="halls" class="glass-section">
+    <div class="container">
+      <h2>Наши залы</h2>
+      <p style="text-align: center; max-width: 800px; margin: 0 auto 40px;">
+        В CinemaLux мы создали уникальные кинозалы, каждый из которых предлагает особый опыт просмотра. Наши залы оборудованы по последнему слову техники - системы Dolby Atmos, экраны 4K с HDR и комфортные кресла с подогревом в VIP-зонах. Мы регулярно обновляем оборудование, чтобы вы могли наслаждаться фильмами в наилучшем качестве.
+      </p>
+      
+      <!-- Автоматический слайдер залов -->
+      <div class="halls-slider">
+        <div class="slider-track" id="sliderTrack">
+          <div class="slider-slide">
+            <img src="assets/i211222.jpeg" alt="Стандартный зал">
+          </div>
+          <div class="slider-slide">
+            <img src="assets/kino.jpg" alt="Зал премиум-класса">
+          </div>
+          <div class="slider-slide">
+            <img src="assets/5dc761cf-004f-5f16-8fee-77b741e1a8d0.jpeg" alt="VIP зал">
+          </div>
+        </div>
+      </div>
+      
+      <div class="cinema-halls" style="margin-top: 40px;">
+        <div class="hall-card">
+          <div class="feature-icon">🎥</div>
+          <h3>Стандартный</h3>
+          <p>Наши стандартные залы превосходят ожидания - комфортные кресла с регулируемыми подлокотниками, оптимальный наклон рядов для лучшего обзора и безупречная акустика. Идеальный баланс цены и качества.</p>
+        </div>
+        <div class="hall-card">
+          <div class="feature-icon">❤️</div>
+          <h3>Для влюбленных</h3>
+          <p>Специальные залы с уютными диванами для пар, приглушенным светом и романтической атмосферой. Идеальное место для свидания - вы можете заказать шампанское и десерты прямо на сеанс.</p>
+        </div>
+        <div class="hall-card">
+          <div class="feature-icon">⭐</div>
+          <h3>VIP</h3>
+          <p>Эксклюзивные залы с массажными креслами, индивидуальным обслуживанием и максимальным комфортом. В стоимость билета входят напитки и закуски. Ограниченное количество мест для особой атмосферы.</p>
+        </div>
+      </div>
+
+      <div style="margin-top: 40px; text-align: center;">
+        <h3>Технические характеристики</h3>
+        <p>Все наши залы соответствуют высочайшим стандартам:</p>
+        <ul style="text-align: left; max-width: 600px; margin: 20px auto;">
+          <li>Цифровые проекторы 4K с поддержкой HDR</li>
+          <li>Системы объемного звука Dolby Atmos</li>
+          <li>Специальное покрытие стен для идеальной акустики</li>
+          <li>Системы климат-контроля с индивидуальными настройками</li>
+          <li>Регулярная профессиональная калибровка оборудования</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Windows App Section -->
+  <section id="windows" class="glass-section">
+    <div class="container">
+      <h2>Версия для Windows</h2>
+      <p style="text-align: center; max-width: 800px; margin: 0 auto 40px;">
+        Наше приложение для Windows 10/11 - это не просто мобильная версия на большом экране, а полноценный десктопный опыт с расширенными возможностями. Интерфейс адаптирован для управления с клавиатуры и мыши, поддерживаются жесты тачпада и сенсорных экранов.
+      </p>
+      
+      <div class="windows-features">
+        <div class="windows-feature">
+          <div class="windows-icon">💌</div>
+          <h3>Билеты на почту</h3>
+          <p>После покупки билеты автоматически отправляются на вашу электронную почту в формате PDF с возможностью печати. Все билеты имеют уникальные QR-коды для быстрой проверки.</p>
+        </div>
+        <div class="windows-feature">
+          <div class="windows-icon">🎫</div>
+          <h3>Мои билеты</h3>
+          <p>Все купленные билеты хранятся в специальном разделе.</p>
+        </div>
+        
+        <div class="windows-feature">
+          <div class="windows-icon">💳</div>
+          <h3>Быстрая оплата</h3>
+          <p>Сохраняйте платёжные данные для моментальной покупки билетов. Поддержка всех популярных платежных систем и криптовалют. Максимальный уровень безопасности.</p>
+        </div>
+      </div>
+
+     
+    </div>
+  </section>
+
+  <!-- Download Section -->
+  <section id="download" class="glass-section">
+    <div class="container">
+      <h2>Скачайте приложение</h2>
+      <p style="text-align: center; margin-bottom: 40px; font-size: 1.2em;">
+        Установите <span class="highlight">CinemaLux</span> и получите доступ ко всем возможностям<br />
+        нашего кинотеатра прямо с вашего устройства. Приложение регулярно обновляется с новыми функциями и улучшениями.
+      </p>
+      
+    <div class="download-buttons">
+  <a href="CinemaLux.exe" class="download-btn" download>Windows (exe)</a>
+</div>
+
+      
+      <div style="text-align: center; margin-top: 40px;">
+        <h3>Системные требования для Windows</h3>
+        <p>Версия 2.1.5 | Размер: 187.5 MB</p>
+        <ul style="text-align: left; max-width: 600px; margin: 20px auto;">
+          <li>Windows 10 (версия 1903 или новее) / Windows 11</li>
+          <li>Процессор с тактовой частотой 1 ГГц или выше</li>
+          <li>2 ГБ оперативной памяти</li>
+          <li>200 МБ свободного места на диске</li>
+          <li>Доступ к интернету для активации функций</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contacts Section -->
+  <section id="contacts" class="glass-section">
+    <div class="container">
+      <h2>Контакты</h2>
+      <p style="text-align: center; max-width: 800px; margin: 0 auto 40px;">
+        Мы всегда рады вашим вопросам и предложениям. Наша команда работает круглосуточно, чтобы обеспечить вам лучший кинематографический опыт. Посетите наш кинотеатр или свяжитесь с нами удобным для вас способом.
+      </p>
+      
+      <div class="contact-info">
+        <div class="contact-item">
+          <div class="contact-icon">📍</div>
+          <h3>Адрес</h3>
+          <p>ул. Ленина, д. 11, Тулун</p>
+          <p>Просторная парковка на 200 мест. Удобный подъезд на общественном транспорте. Рядом кафе и рестораны.</p>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">📞✉️</div>
+          <h3>Телефон/Почта</h3>
+          <p>+7 950 100-13-50 (круглосуточно)</p>
+          <p>krupkodaniil119@gmail.com</p>
+          <p>Техническая поддержка: support@cinemalux.ru</p>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">🕒</div>
+          <h3>Часы работы</h3>
+          <p>Ежедневно с 9:00 до 23:00</p>
+          <p>Кассы открыты до 22:30</p>
+          <p>Бронирование онлайн - круглосуточно</p>
+        </div>
+      </div>
+
+      
+  </section>
+
+  <footer>
+    <div class="container">
+      <div class="footer-links">
+        <a href="#app" class="footer-link">Приложение</a>
+        <a href="#halls" class="footer-link">Наши залы</a>
+        <a href="#windows" class="footer-link">Версия для Windows</a>
+        <a href="#download" class="footer-link">Скачать</a>
+        <a href="#contacts" class="footer-link">Контакты</a>
+        <a href="#" class="footer-link">Политика конфиденциальности</a>
+        <a href="#" class="footer-link">Условия использования</a>
+        <a href="#" class="footer-link">Вакансии</a>
+        <a href="#" class="footer-link">Партнерам</a>
+      </div>
+      <p>© 2025 CinemaLux. Все права защищены.</p>
+      <p style="margin-top: 10px; font-size: 0.9em; opacity: 0.7;">
+        CinemaLux - это современный кинотеатр, сочетающий в себе лучшие традиции кинопоказа и инновационные технологии. 
+        Мы стремимся сделать ваш поход в кино незабываемым событием.
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    // Скрываем экран загрузки после загрузки страницы
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        document.getElementById('loadingScreen').style.opacity = '0';
+        setTimeout(function() {
+          document.getElementById('loadingScreen').style.display = 'none';
+        }, 500);
+      }, 1500); // Имитация загрузки 3D сцены
+    });
+
+    // Автоматический слайдер для залов
+    document.addEventListener('DOMContentLoaded', function() {
+      const track = document.getElementById('sliderTrack');
+      const slides = document.querySelectorAll('.slider-slide');
+      let currentSlide = 0;
+      
+      function moveToSlide(index) {
+        track.style.transform = `translateX(-${index * 100}%)`;
+        currentSlide = index;
+      }
+      
+      function nextSlide() {
+        currentSlide = (currentSlide + 1) % slides.length;
+        moveToSlide(currentSlide);
+      }
+      
+      // Автопереключение каждые 5 секунд
+      setInterval(nextSlide, 5000);
+      
+      // Инициализация первого слайда
+      moveToSlide(0);
+    });
+    
+    // Скрываем watermark Spline с помощью JavaScript на случай, если CSS не сработает
+    setTimeout(() => {
+      const watermarks = document.querySelectorAll('[data-spline-watermark]');
+      watermarks.forEach(wm => wm.style.display = 'none');
+    }, 1000);
+  </script>
+</body>
+</html>
+
+
